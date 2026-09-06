@@ -19,6 +19,15 @@ hybrid TDT-CTC Parakeet checkpoint; and `captionlm.merge` replaces only
 time-aligned spans in the base transcript. The graph is constructed for each
 recording, so no user data is used for training or retained by a service.
 
+Every path into the model -- the browser, the batch script, the CLI and the
+eval harness -- goes through `captionlm.progressive`, not the library's own
+`transcribe`. It is the same overlapping-window loop, except that it decodes
+`DECODE_BATCH` chunks under one TDT loop instead of one at a time. Chunks were
+always independent, so the transcript is byte-identical; the decode step is
+dispatch-bound rather than compute-bound, so the batch is close to free. That
+is roughly half the runtime on long audio, and the measurements are in
+`docs/results/2026-09-05-decode-speed.md`.
+
 The CTC head is required for the word spotter. Consequently, a plain TDT
 checkpoint can be used as an independent baseline but cannot replace the
 hybrid transcription-and-biasing path. NVIDIA's 0.6B-v3 checkpoint is such a

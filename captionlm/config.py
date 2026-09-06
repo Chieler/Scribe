@@ -15,6 +15,15 @@ MODEL_ID_1_1B = "mlx-community/parakeet-tdt_ctc-1.1b"
 MODEL_ID = MODEL_ID_110M
 TERM_EXTRACTION_TOP_N = 50
 
+# How many chunks share one TDT decode loop. The decode step is dispatch-
+# bound (0.49 ms at batch 1, 0.71 ms at batch 8), so this is close to free
+# speed: measured on a 55-minute Earnings-21 clip with the 110m model,
+# 54.7 s at 1, 23.0 s at 4, 19.0 s at 8, with byte-identical transcripts.
+# It stops at 4 because every chunk in a batch is decoded before any of its
+# text is handed out, and the browser path shows partials as they land: 4
+# chunks is about 7 minutes of audio between updates already.
+DECODE_BATCH = 4
+
 # SEC EDGAR requires a descriptive contact string in the User-Agent header
 # on every request. Fill this in with a real contact before running
 # captionlm/eval_dataset.py against the live API.

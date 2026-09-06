@@ -32,6 +32,7 @@ import jiwer
 from captionlm.biased_model import load_biased_model
 from captionlm.config import MODEL_ID
 from captionlm.fusion import WHISPER_MODEL_ID, fuse_text, second_opinion
+from captionlm.progressive import transcribe_progressive
 from captionlm.terms import build_context_graph, load_term_list, load_tokenizer
 from captionlm.vendor.fscore import compute_fscore, keyword_stats
 
@@ -54,7 +55,7 @@ def load_clips(clip_dir: str, fallback_terms: list[str] | None = None) -> list[d
 def transcribe_clips(model, clips: list[dict]) -> list[dict]:
     samples = []
     for clip in clips:
-        result = model.transcribe(clip["wav"], chunk_duration=120.0)
+        result = transcribe_progressive(model, clip["wav"])
         samples.append({"text": clip["text"], "pred_text": result.text})
     return samples
 

@@ -82,10 +82,7 @@ def test_caption_file_can_return_plain_text(monkeypatch):
         ],
     )
 
-    class Model:
-        def transcribe(self, path, chunk_duration):
-            return result
-
-    monkeypatch.setattr(cli, "load_biased_model", lambda model_id: Model())
+    monkeypatch.setattr(cli, "load_biased_model", lambda model_id: object())
+    monkeypatch.setattr(cli, "transcribe_progressive", lambda model, path: result)
 
     assert cli.caption_file("recording.wav", None, output_format="txt") == "hello world\n"

@@ -10,6 +10,7 @@ from captionlm.biased_model import load_biased_model
 from captionlm.config import MODEL_ID, select_cb_weight
 from captionlm.disfluency import strip_restarts
 from captionlm.fusion import WHISPER_MODEL_ID, fuse_tokens, second_opinion
+from captionlm.progressive import transcribe_progressive
 from captionlm.terms import build_context_graph, load_term_list, load_tokenizer
 
 
@@ -102,7 +103,7 @@ def caption_file(
         model.context_graph = build_context_graph(terms, tokenizer, blank_idx)
         configure_document_bias(model, audio_path, model.spotter_config.cb_weight)
 
-    result = model.transcribe(audio_path, chunk_duration=120.0)
+    result = transcribe_progressive(model, audio_path)
 
     if second_opinion_model:
         second = second_opinion(audio_path, second_opinion_model)

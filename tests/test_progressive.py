@@ -20,12 +20,17 @@ class FakeModel:
 
     def __init__(self):
         self.calls = 0
+        self.batches = 0
 
     def generate(self, mel, *, decoding_config=None):
         self.calls += 1
         token = AlignedToken(id=self.calls, text=f" chunk{self.calls}", start=0.0, duration=1.0)
         token.end = 1.0
         return [sentences_to_result(tokens_to_sentences([token]))]
+
+    def generate_batch(self, mels, *, decoding_config=None):
+        self.batches += 1
+        return [self.generate(mel)[0] for mel in mels]
 
 
 @pytest.fixture
@@ -82,3 +87,17 @@ def test_the_last_partial_is_what_gets_returned(stubbed, monkeypatch):
         stubbed, "x.wav", chunk_duration=120.0, on_partial=lambda r, d, t: last.append(r.text)
     )
     assert result.text == last[-1]
+
+
+def test_chunks_are_decoded_in_batches(stubbed, monkeypatch):
+    # 6 chunks at batch 2 is 3 decode calls, not 6, and the partials still
+    # arrive one per chunk in order.
+    _audio(monkeypatch, 540)
+    seen = []
+    progressive.transcribe_progressive(
+        stubbed, "x.wav", chunk_duration=120.0, overlap_duration=15.0, decode_batch=2,
+        on_partial=lambda r, d, t: seen.append(round(d, 1)),
+    )
+    assert stubbed.calls == 6
+    assert stubbed.batches == 3
+    assert seen == sorted(seen) and len(seen) == 6

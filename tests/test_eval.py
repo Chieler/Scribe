@@ -54,10 +54,10 @@ def test_transcribe_biased_builds_a_graph_per_clip(monkeypatch):
     class FakeModel:
         context_graph = None
 
-        def transcribe(self, wav_path, chunk_duration=120.0):
-            graphs_seen.append(self.context_graph)
-            return FakeResult()
-
+    monkeypatch.setattr(
+        "captionlm.eval.transcribe_progressive",
+        lambda model, wav_path: graphs_seen.append(model.context_graph) or FakeResult(),
+    )
     monkeypatch.setattr(
         "captionlm.eval.build_context_graph",
         lambda terms, tokenizer, blank_idx: tuple(terms),

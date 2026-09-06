@@ -27,6 +27,7 @@ from captionlm.config import MODEL_ID, SpotterConfig
 from captionlm.doc_import import extract_text
 from captionlm.biased_model import load_biased_model
 from captionlm.fusion import WHISPER_MODEL_ID, fuse_tokens, second_opinion
+from captionlm.progressive import transcribe_progressive
 from captionlm.terms import build_context_graph, load_tokenizer
 
 AUDIO_EXTS = {".mp3", ".mp4", ".m4a", ".wav", ".mov", ".aac", ".flac", ".ogg", ".webm", ".mkv"}
@@ -152,7 +153,7 @@ def main():
             weight = configure_document_bias(model, wav, base_cb_weight)
             print(f"  document bias: cb_weight={weight:g}")
 
-        result = model.transcribe(wav, chunk_duration=120.0)
+        result = transcribe_progressive(model, wav)
 
         if args.second_opinion:
             print("  asking for a second opinion ...", flush=True)

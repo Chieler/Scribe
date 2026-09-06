@@ -21,6 +21,7 @@ from parakeet_mlx.audio import load_audio
 from captionlm.config import MODEL_ID_110M
 from captionlm.eval import _wer
 from captionlm.live import LiveSession
+from captionlm.progressive import transcribe_progressive
 from captionlm.terms import build_context_graph, load_term_list, load_tokenizer
 from captionlm.biased_model import load_biased_model
 
@@ -63,7 +64,7 @@ def measure_acceptance(model, wav: str, reference: str, **kw) -> dict:
     """
     _, committed, _, _ = _feed(model, wav, **kw)
     live_text = "".join(t.text for t in committed).strip()
-    batch_text = model.transcribe(wav, chunk_duration=120.0).text.strip()
+    batch_text = transcribe_progressive(model, wav).text.strip()
 
     # _wer applies eval.py's normaliser to both sides, so this number is
     # directly comparable to every other WER this project has recorded.
