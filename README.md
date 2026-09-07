@@ -37,6 +37,33 @@ A document with the same basename as a recording applies only to that
 recording. An unpaired document is treated as a shared glossary. A recording
 with no document is transcribed normally, with no contextual bias.
 
+## Choose a model
+
+Two acoustic models, picked per job, not installed together:
+
+| Model | Flag / preset | Size | Speed |
+|---|---|---|---|
+| 110M hybrid (default) | `110m` | 438 MB | ~59x realtime |
+| 1.1B hybrid | `1.1b` | 4.0 GB | ~30x realtime |
+
+Both download from Hugging Face on first use and cache under
+`~/.cache/huggingface`. To fetch one ahead of time instead of waiting on
+first run:
+
+```bash
+hf download mlx-community/parakeet-tdt_ctc-110m
+hf download mlx-community/parakeet-tdt_ctc-1.1b
+```
+
+Pick per entry point:
+
+- Browser (`scripts/serve.py`): Small/Large buttons in the UI.
+- Batch (`scripts/caption_dropoff.py`): `--model mlx-community/parakeet-tdt_ctc-1.1b`
+- CLI (`captionlm.cli`): `--model mlx-community/parakeet-tdt_ctc-1.1b`
+
+See [docs/RESULTS.md](docs/RESULTS.md) for the WER/speed trade-off behind
+the choice.
+
 ## Operating policy
 
 - Short, document-matched recordings use domain bias at `cb_weight=3.0`.

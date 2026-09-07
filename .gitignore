@@ -10,7 +10,13 @@ captionlm.egg-info/
 .claude/
 .vscode/
 CLAUDE.md
-
+.impeccable/
+.pytest_cache/
+data/
+docs/
+.serena/
+.superpowers/
+benchmark/
 # user drop-off: keep the README, ignore everything dropped in
 dropoff/*
 !dropoff/README.md
