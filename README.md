@@ -1,4 +1,4 @@
-# captionlm
+# Scribe
 
 Local captions that preserve terminology from a trusted source document.
 Give it a recording plus the notes, slides, reading, or glossary it is about;
